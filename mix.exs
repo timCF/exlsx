@@ -16,7 +16,6 @@ defmodule Exlsx.Mixfile do
   def application do
     [applications:  [
                       :logger,
-                      :ossp_uuid,
                       :silverb,
                       :csvex,
                       :exutils,
@@ -36,7 +35,6 @@ defmodule Exlsx.Mixfile do
   # Type `mix help deps` for more examples and options
   defp deps do
     [
-      {:ossp_uuid, github: "yrashk/erlang-ossp-uuid"},
       {:silverb, github: "timCF/silverb"},
       {:csvex, github: "timCF/csvex"},
       {:exutils, github: "timCF/exutils"},
