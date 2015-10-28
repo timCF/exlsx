@@ -22,8 +22,8 @@ defmodule Exlsx do
     Supervisor.start_link(children, opts)
   end
 
-  def encode(lst = [_|_], opts \\ @default_opts) do 
-    dirname = Exutils.priv_dir(:exlsx)<>"/"<>:ossp_uuid.make(:v4, :text)
+  def encode(lst = [_|_], opts \\ @default_opts) do
+    dirname = Exutils.priv_dir(:exlsx)<>"/"<>Exutils.make_uuid
     File.mkdir!(dirname)
     try do
       File.write!(dirname<>"/#{@filename}.csv", Csvex.encode(lst, opts))
@@ -31,13 +31,13 @@ defmodule Exlsx do
       content = File.read!(dirname<>"/#{@filename}.xlsx")
       cleanup(dirname)
       content
-    catch 
-      error -> 
+    catch
+      error ->
         Exlsx.error(inspect(error)<>" try do cleanup")
         cleanup(dirname)
         raise(inspect(error))
     rescue
-      error -> 
+      error ->
         Exlsx.error(inspect(error)<>" try do cleanup")
         cleanup(dirname)
         raise(inspect(error))
