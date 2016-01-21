@@ -22,15 +22,23 @@ defmodule Exlsx do
     Supervisor.start_link(children, opts)
   end
 
-  def encode(lst = [_|_], opts \\ @default_opts) do
+  def encode(lst = [_|_], opts \\ @default_opts, postfix \\ "xlsx") do
     dirname = Exutils.priv_dir(:exlsx)<>"/"<>Exutils.make_uuid
     File.mkdir!(dirname)
     try do
-      File.write!(dirname<>"/#{@filename}.csv", Csvex.encode(lst, opts))
-      :os.cmd('cd #{dirname} && csv2xlsx \'utf-8\' #{@filename} < ./#{@filename}.csv > ./#{@filename}.xlsx && soffice --headless --convert-to xls ./#{@filename}.xlsx && rm -rf ./#{@filename}.csv && soffice --headless --convert-to xlsx ./#{@filename}.xls && rm -rf ./#{@filename}.xls')
-      content = File.read!(dirname<>"/#{@filename}.xlsx")
-      cleanup(dirname)
-      content
+		File.write!(dirname<>"/#{@filename}.csv", Csvex.encode(lst, opts))
+		case postfix do
+			"xlsx" ->
+				:os.cmd('cd #{dirname} && csv2xlsx \'utf-8\' #{@filename} < ./#{@filename}.csv > ./#{@filename}.xlsx && soffice --headless --convert-to xls ./#{@filename}.xlsx && rm -rf ./#{@filename}.csv && soffice --headless --convert-to xlsx ./#{@filename}.xls && rm -rf ./#{@filename}.xls')
+				content = File.read!(dirname<>"/#{@filename}.xlsx")
+				cleanup(dirname)
+				content
+			"xls" ->
+				:os.cmd('cd #{dirname} && csv2xlsx \'utf-8\' #{@filename} < ./#{@filename}.csv > ./#{@filename}.xlsx && soffice --headless --convert-to xls ./#{@filename}.xlsx && rm -rf ./#{@filename}.csv')
+				content = File.read!(dirname<>"/#{@filename}.xls")
+				cleanup(dirname)
+				content
+		end
     catch
       error ->
         Exlsx.error(inspect(error)<>" try do cleanup")
